@@ -1,0 +1,64 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Home</title>
+    <link rel="stylesheet" href="index.css">
+    <link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined:opsz,wght,FILL,GRAD@20..48,100..700,0..1,-50..200" />
+</head>
+
+<body>
+    <div class="main">
+
+        <div class="temp-side">
+            <form id="cityForm">
+              
+                <input type="text" id="cityInput" placeholder="&nbsp &nbsp Enter city name" required>
+                <button type="submit" >Search</button>
+              </form>
+            <img id="imageToShow" src="" alt="">
+            <li>
+                <!-- <span id="cloud_pct"></span> -->
+                <span id="temp"></span><sup><sup>.</sup>C</sup>
+                <!-- <span id="feels_like"></span> -->
+                <!-- <span id="humidity"></span> -->
+                <!-- <span id="min_temp"></span> -->
+                <!-- <span id="max_temp"></span> -->
+                <!-- <span id="wind_speed"></span> -->
+                <!-- <span id="wind_degrees"></span> -->
+                <!-- <span id="sunrise"></span>
+                <span id="sunset"></span> -->
+            </li>
+            <span id="currentDateTime"></span>
+            <span id="searchedCity" ></span>
+            <!-- <div class="image-container"> -->
+            <img id="city" src="city.jpg" alt="" >
+            
+        </div>
+        <div class="main-side">
+
+            <div id="forecastContainer" class="forecast-container">
+            </div>
+            <h5>Today's Highlights</h5>
+            <div class="others-data">
+                <div class="data">Humidity:&nbsp<span id="humidity"></span></div>
+                <div class="data">Wind Speed:&nbsp <span id="wind_speed" ></span></div>
+                <div class="data">Wind Degrees:&nbsp <span id="wind_degrees"></span></div>
+                <div class="data">Feels Like:&nbsp <span id="feels_like"></span></div>
+            </div>
+            <div class="others-data1">
+                <div class="data">Cloud Pct:&nbsp <span id="cloud_pct"></span></div>
+                <div class="data">Min Temp:&nbsp <span id="min_temp"></span></div>
+                <div class = "data"><span id="sunrise"></span></div>
+                <div class="data"><span id="sunset"></span></div>
+            </div>
+            
+        </div>
+    </div>
+</body>
+<script src="script.js"></script>
+<!-- <script src="script1.js"></script>// -->
+
+</html>

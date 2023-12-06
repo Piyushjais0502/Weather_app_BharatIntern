@@ -1,0 +1,190 @@
+* {
+    padding: 0;
+    margin: 0;
+}
+
+.main {
+    display: flex;
+    justify-content: space-between;
+    /* background-color: #F9FAFB; */
+    width: 100%;
+}
+
+.temp-side {
+    display: flex;
+    flex-direction: column;
+    width: 25%;
+    height: auto;
+    padding: 25px;
+    margin: 20px;
+    background-color: #D6D7DB;
+    border-radius: 25px;
+}
+#cityInput {
+    width: 150px;
+    height: auto;
+    border-radius: 5px;
+    border-color: black;
+    font-size: 15px;
+    padding: 5px;
+}
+
+button
+{
+    background-color:bisque;
+    border-radius:5px;
+    font-size: 14px;
+    padding: 5px;
+}
+.temp-side img {
+    width: 120px;
+    height: auto;
+    margin-top: 70px;
+}
+
+.temp-side li {
+    display: flex;
+    list-style: none;
+    margin-top: 10px;
+
+}
+
+.temp-side sup {
+    font-size: 25px;
+}
+
+#temp {
+    font-size: 50px;
+
+}
+
+#currentDateTime {
+    margin-top: 10px;
+    font-size: larger;
+}
+
+#city {
+    border-radius: 15px;
+    width: 220px;
+    height: 100px;
+    margin-top: px;
+}
+#searchedCity
+{
+    margin-top: 10px;
+    font-size: 42px;
+}
+.main-side {
+    margin: 20px;
+    width: 75%;
+    background-color: #F6F6F8;
+    border-radius: 25px;
+    height: auto;
+}
+
+/* ... (your existing CSS code) ... */
+
+/* Style for the day containers */
+/* .day-container {
+    
+} */
+
+.forecast-container
+{
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    padding: 20px;
+}
+.day-container
+{
+    display: flex;
+    align-items: center;
+    width: 200px;
+    height: 100px;
+    padding: 0 10px;
+    background-color: white;
+    border: 10px solid white;
+    border-radius: 25px;
+    margin: 0px 10px;
+}
+.day-container, #text
+{
+    display: flex;
+    align-items: center;
+    font-size: 20px;
+}
+
+.forecast-container img
+{
+    width: 45px;
+    padding-left: 7px;
+}
+/* ... (your existing CSS code) ... */
+
+h5{
+    font-size: 25px;
+    padding:0px 65px;
+    margin-top: 30px;
+}
+
+.others-data
+{
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    padding: 20px;
+}
+.data
+    {
+        display: flex;
+        align-items: center;
+        width: 200px;
+        height: 100px;
+        padding: 0 10px;
+        background-color: white;
+        border: 10px solid white;
+        border-radius: 25px;
+        margin: 0px 10px;
+    }
+    .others-data1
+    {
+        display: flex;
+        align-items: center;
+        justify-content: space-between;
+        padding: 20px;
+    }
+
+    @media only screen and (max-width: 600px) {
+        .main {
+            flex-direction: column;
+        }
+        .temp-side, .main-side, .others-data, .others-data1, .forecast-container {
+            width: 100%;
+            flex-direction: column;
+        }
+        
+    }
+    @media only screen and (min-width: 601px) and (max-width: 1024px) {
+        .main {
+            flex-direction: row;
+        }
+        .temp-side {
+            width: 50%;
+        }
+        .main-side {
+            width: 50%;
+        }
+    }
+    @media only screen and (min-width: 1025px) {
+        .main {
+            flex-direction: row;
+        }
+        .temp-side {
+            width: 25%;
+        }
+        .main-side {
+            width: 75%;
+        }
+    }
+    
