@@ -1,140 +1,129 @@
 const apiKey = '45410a19bac403c84695ad21f382ab93';
-    let city = 'New Delhi'; // Default city
+let city = 'New Delhi'; // Default city
 
-    // Function to fetch weather data from RapidAPI
-    const fetchData = async (city) => {
-      const url = `https://weather-by-api-ninjas.p.rapidapi.com/v1/weather?city=${city}`;
-      const options = {
-        method: "GET",
-        headers: {
-          "X-RapidAPI-Key": "629d0bc979msh3d3bb698cc195f4p199586jsn78abd05f4e9c",
-          "X-RapidAPI-Host": "weather-by-api-ninjas.p.rapidapi.com",
-        },
-      };
+// Function to fetch current weather data
+const fetchCurrentWeather = async (city) => {
+    try {
+        const url = `https://api.openweathermap.org/data/2.5/weather?q=${city}&units=metric&appid=${apiKey}`;
+        const response = await fetch(url);
+        if (!response.ok) {
+            throw new Error(`Weather data not found for ${city}`);
+        }
+        const data = await response.json();
+        
+        // Update current weather data
+        document.getElementById('temp').innerHTML = Math.round(data.main.temp);
+        document.getElementById('humidity').innerHTML = data.main.humidity + '%';
+        document.getElementById('wind_speed').innerHTML = data.wind.speed + ' m/s';
+        document.getElementById('wind_degrees').innerHTML = data.wind.deg + '°';
+        document.getElementById('feels_like').innerHTML = Math.round(data.main.feels_like) + '°C';
+        document.getElementById('cloud_pct').innerHTML = data.clouds.all + '%';
+        document.getElementById('min_temp').innerHTML = Math.round(data.main.temp_min) + '°C';
+        document.getElementById('searchedCity').innerHTML = data.name;
 
-      try {
-        const response = await fetch(url, options);
-        const result = await response.json();
+        // Update sunrise and sunset times
+        const sunriseTime = new Date(data.sys.sunrise * 1000).toLocaleTimeString();
+        const sunsetTime = new Date(data.sys.sunset * 1000).toLocaleTimeString();
+        document.getElementById('sunrise').textContent = `Sunrise: ${sunriseTime}`;
+        document.getElementById('sunset').textContent = `Sunset: ${sunsetTime}`;
 
-        // Update HTML elements with weather data
-        document.getElementById('temp').innerHTML = result.temp;
-        document.getElementById('humidity').innerHTML = result.humidity;
-        document.getElementById('wind_speed').innerHTML = result.wind_speed;
-        document.getElementById('wind_degrees').innerHTML = result.wind_degrees;
-        document.getElementById('feels_like').innerHTML = result.feels_like;
-        document.getElementById('cloud_pct').innerHTML = result.cloud_pct;
-        document.getElementById('min_temp').innerHTML = result.min_temp;
-        document.getElementById('searchedCity').innerHTML = city;
+        // Update weather image based on conditions
+        const weatherIcon = data.weather[0].icon;
+        const imageToShow = document.getElementById("imageToShow");
+        if (weatherIcon.includes('d')) { // Day time
+            imageToShow.src = "img.png";
+        } else { // Night time
+            imageToShow.src = "img2.png";
+        }
 
-        console.log(result);
-      } catch (error) {
-        console.error(error);
-      }
-    };
+        return data;
+    } catch (error) {
+        console.error('Error fetching current weather:', error);
+        alert(`Error: ${error.message}`);
+    }
+};
 
-    // Function to fetch weather data from OpenWeatherMap
-    const fetchOpenWeatherData = (city) => {
-      const apiUrl = `https://api.openweathermap.org/data/2.5/forecast?q=${city}&appid=${apiKey}`;
+// Function to fetch forecast data
+const fetchForecast = async (city) => {
+    try {
+        const url = `https://api.openweathermap.org/data/2.5/forecast?q=${city}&units=metric&appid=${apiKey}`;
+        const response = await fetch(url);
+        if (!response.ok) {
+            throw new Error(`Forecast data not found for ${city}`);
+        }
+        const data = await response.json();
 
-      fetch(apiUrl)
-        .then(response => {
-          if (!response.ok) {
-            throw new Error(`HTTP error! Status: ${response.status}`);
-          }
-          return response.json();
-        })
-        .then(data => {
-          // Organize forecasts by date and track max temperature for each day
-          const dailyMaxTemps = {};
+        // Process and display forecast data
+        const forecastContainer = document.getElementById('forecastContainer');
+        forecastContainer.innerHTML = ''; // Clear previous forecast data
 
-          data.list.forEach(forecast => {
-            const timestamp = forecast.dt;
-            const date = new Date(timestamp * 1000);
-            const formattedDate = date.toLocaleDateString('en-US', { weekday: 'long' });
+        // Create a map to store daily forecasts
+        const dailyForecasts = new Map();
 
-            // Convert temperature from Kelvin to Celsius
-            const temperatureKelvin = forecast.main.temp;
-            const temperatureCelsius = temperatureKelvin - 273.15;
-
-            // Update max temperature for the day
-            if (!dailyMaxTemps[formattedDate] || temperatureCelsius > dailyMaxTemps[formattedDate]) {
-              dailyMaxTemps[formattedDate] = temperatureCelsius;
+        // Process forecast data
+        data.list.forEach(forecast => {
+            const date = new Date(forecast.dt * 1000);
+            const day = date.toLocaleDateString('en-US', { weekday: 'long' });
+            
+            if (!dailyForecasts.has(day)) {
+                dailyForecasts.set(day, {
+                    temp: Math.round(forecast.main.temp),
+                    icon: forecast.weather[0].icon,
+                    description: forecast.weather[0].description
+                });
             }
-          });
+        });
 
-          // Display max temperatures for each day
-          const forecastContainer = document.getElementById('forecastContainer');
-          forecastContainer.innerHTML = ''; // Clear previous forecast data
+        // Display only the next 7 days
+        let count = 0;
+        for (const [day, forecast] of dailyForecasts) {
+            if (count >= 7) break;
 
-          for (const date in dailyMaxTemps) {
-            // Create a container for each day's forecast
             const dayContainer = document.createElement('div');
             dayContainer.classList.add('day-container');
-
-            // Update the HTML element with forecast information
-            dayContainer.innerHTML = ` ${date}  ${dailyMaxTemps[date].toFixed(2)} °C`;
-
-            const dayImage = document.createElement('img');
-            dayImage.src = 'wea.png';
-            dayContainer.appendChild(dayImage);
-
-            // Append the day's container to the main forecast container
+            dayContainer.innerHTML = `
+                ${day}<br>${forecast.temp}°C
+                <img src="wea.png" alt="weather icon">
+            `;
             forecastContainer.appendChild(dayContainer);
-          }
-
-          // Extract and display sunrise and sunset times
-          const sunriseTimestamp = data.city.sunrise;
-          const sunsetTimestamp = data.city.sunset;
-
-          const sunriseTime = new Date(sunriseTimestamp * 1000).toLocaleTimeString();
-          const sunsetTime = new Date(sunsetTimestamp * 1000).toLocaleTimeString();
-
-          document.getElementById('sunrise').textContent = `Sunrise: ${sunriseTime}`;
-          document.getElementById('sunset').textContent = `Sunset: ${sunsetTime}`;
-        })
-        .catch(error => {
-          console.error('Error:', error);
-        });
-    };
-
-    // Call the fetchData and fetchOpenWeatherData functions with the default city
-    fetchData(city);
-    fetchOpenWeatherData(city);
-
-    // Event listener for form submission
-    document.getElementById('cityForm').addEventListener('submit', function (event) {
-      event.preventDefault();
-      const newCity = document.getElementById('cityInput').value;
-
-      // Update the city variable and call the fetchData and fetchOpenWeatherData functions
-      city = newCity;
-      fetchData(city);
-      fetchOpenWeatherData(city);
-    });
-
-    // Function to get current date and time
-    function getCurrentDateTime() {
-      var currentDate = new Date();
-      var currentHour = currentDate.getHours();
-      var currentMinutes = currentDate.getMinutes();
-      var currentDay = currentDate.getDay();
-
-      var imageToShow = document.getElementById("imageToShow");
-
-      if (currentHour < 12) {
-        imageToShow.src = "img.png";
-      } else {
-        imageToShow.src = "img2.png";
-      }
-
-      var daysOfWeek = ["Sunday", "Monday", "Tuesday", "Wednesday", "Thursday", "Friday", "Saturday"];
-      var dayOfWeek = daysOfWeek[currentDay];
-
-      var formattedTime = currentHour + ":" + (currentMinutes < 10 ? "0" : "") + currentMinutes;
-
-      document.getElementById("currentDateTime").innerHTML = formattedTime + "," + dayOfWeek;
+            count++;
+        }
+    } catch (error) {
+        console.error('Error fetching forecast:', error);
     }
+};
 
-    getCurrentDateTime();
+// Function to update all weather data
+const updateWeather = async (city) => {
+    await fetchCurrentWeather(city);
+    await fetchForecast(city);
+};
 
-    setInterval(getCurrentDateTime, 60000);
+// Event listener for form submission
+document.getElementById('cityForm').addEventListener('submit', function (event) {
+    event.preventDefault();
+    const newCity = document.getElementById('cityInput').value;
+    if (newCity) {
+        city = newCity;
+        updateWeather(city);
+    }
+});
+
+// Function to get current date and time
+function getCurrentDateTime() {
+    const currentDate = new Date();
+    const currentHour = currentDate.getHours();
+    const currentMinutes = currentDate.getMinutes();
+    const currentDay = currentDate.getDay();
+
+    const daysOfWeek = ["Sunday", "Monday", "Tuesday", "Wednesday", "Thursday", "Friday", "Saturday"];
+    const dayOfWeek = daysOfWeek[currentDay];
+
+    const formattedTime = `${currentHour}:${currentMinutes < 10 ? "0" : ""}${currentMinutes}`;
+    document.getElementById("currentDateTime").innerHTML = `${formattedTime}, ${dayOfWeek}`;
+}
+
+// Initial weather update and time display
+updateWeather(city);
+getCurrentDateTime();
+setInterval(getCurrentDateTime, 60000); // Update time every minute

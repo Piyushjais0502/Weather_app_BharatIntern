@@ -1,44 +1,54 @@
 const apiKey = '45410a19bac403c84695ad21f382ab93';
 const city = 'New Delhi';
-const apiUrl = `https://api.openweathermap.org/data/2.5/forecast?q=${city}&appid=${apiKey}`;
 
-// Make the API request using the Fetch API
-fetch(apiUrl)
-  .then(response => {
-    if (!response.ok) {
-      throw new Error(`HTTP error! Status: ${response.status}`);
+// Function to fetch and display forecast data
+const fetchForecastData = async () => {
+    try {
+        const url = `https://api.openweathermap.org/data/2.5/forecast?q=${city}&units=metric&appid=${apiKey}`;
+        const response = await fetch(url);
+        if (!response.ok) {
+            throw new Error(`HTTP error! Status: ${response.status}`);
+        }
+        const data = await response.json();
+
+        // Display forecast for each day
+        const forecastResults = document.getElementById('forecastResults');
+        forecastResults.innerHTML = ''; // Clear previous results
+
+        // Create a map to store daily forecasts
+        const dailyForecasts = new Map();
+
+        // Process forecast data
+        data.list.forEach(forecast => {
+            const date = new Date(forecast.dt * 1000);
+            const day = date.toLocaleDateString('en-US', { weekday: 'long' });
+            
+            if (!dailyForecasts.has(day)) {
+                dailyForecasts.set(day, {
+                    maxTemp: forecast.main.temp,
+                    minTemp: forecast.main.temp,
+                    description: forecast.weather[0].description
+                });
+            } else {
+                const current = dailyForecasts.get(day);
+                current.maxTemp = Math.max(current.maxTemp, forecast.main.temp);
+                current.minTemp = Math.min(current.minTemp, forecast.main.temp);
+            }
+        });
+
+        // Display the forecast
+        for (const [day, forecast] of dailyForecasts) {
+            const forecastString = `${day}: ${forecast.description}, Max: ${Math.round(forecast.maxTemp)}°C, Min: ${Math.round(forecast.minTemp)}°C<br>`;
+            forecastResults.innerHTML += forecastString;
+        }
+
+    } catch (error) {
+        console.error('Error:', error);
+        const forecastResults = document.getElementById('forecastResults');
+        forecastResults.innerHTML = `Error fetching weather data: ${error.message}`;
     }
-    return response.json();
-  })
-  .then(data => {
-    // Organize forecasts by date and track max temperature for each day
-    const dailyMaxTemps = {};
+};
 
-    data.list.forEach(forecast => {
-      const timestamp = forecast.dt;
-      const date = new Date(timestamp * 1000);
-      const formattedDate = date.toLocaleDateString('en-US', { weekday: 'long' });
-
-      // Convert temperature from Kelvin to Celsius
-      const temperatureKelvin = forecast.main.temp;
-      const temperatureCelsius = temperatureKelvin - 273.15;
-
-      // Update max temperature for the day
-      if (!dailyMaxTemps[formattedDate] || temperatureCelsius > dailyMaxTemps[formattedDate]) {
-        dailyMaxTemps[formattedDate] = temperatureCelsius;
-      }
-    });
-
-    // Display max temperatures for each day
-    const forecastResults = document.getElementById('forecastResults');
-    for (const date in dailyMaxTemps) {
-      // console.log(`Date: ${date}, Max Temperature: ${dailyMaxTemps[date].toFixed(2)} °C`);
-      
-      // Update the HTML element with forecast information
-      forecastResults.innerHTML += ` ${date}, Max Temperature: ${dailyMaxTemps[date].toFixed(2)} °C`;
-    }
-  })
-  .catch(error => {
-    console.error('Error:', error);
-  });
+// Call the function to fetch and display forecast data
+fetchForecastData();
 
